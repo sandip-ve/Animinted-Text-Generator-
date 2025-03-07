@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Animated Image Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff6f61, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        #text-input, #style-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #text-input:focus, #style-select:focus {
+            border-color: #ff6f61;
+        }
+
+        #generate-btn, #download-btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            color: #fff;
+            background: linear-gradient(135deg, #ff6f61, #ffcc00);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #generate-btn:hover, #download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 111, 97, 0.4);
+        }
+
+        #download-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .animated-text {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        canvas {
+            display: none; /* Hide the canvas element */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Colorful Animated Image Generator</h1>
+        <div class="form-group">
+            <label for="text-input">Enter Your Text:</label>
+            <input type="text" id="text-input" placeholder="Type something creative...">
+        </div>
+        <div class="form-group">
+            <label for="style-select">Choose Title Style:</label>
+            <select id="style-select">
+                <option value="gradient">Gradient Text</option>
+                <option value="shadow">Text with Shadow</option>
+                <option value="outline">Outlined Text</option>
+            </select>
+        </div>
+        <button id="generate-btn">Generate Animated Text</button>
+        <button id="download-btn" disabled>Download as Image</button>
+        <div id="output"></div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('text-input');
+        const styleSelect = document.getElementById('style-select');
+        const generateBtn = document.getElementById('generate-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const output = document.getElementById('output');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        generateBtn.addEventListener('click', function () {
+            const text = textInput.value.trim();
+            const style = styleSelect.value;
+
+            if (text) {
+                let styledText = '';
+                switch (style) {
+                    case 'gradient':
+                        styledText = `<span style="background: linear-gradient(135deg, #ff6f61, #ffcc00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${text}</span>`;
+                        break;
+                    case 'shadow':
+                        styledText = `<span style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">${text}</span>`;
+                        break;
+                    case 'outline':
+                        styledText = `<span style="color: white; -webkit-text-stroke: 2px #ff6f61;">${text}</span>`;
+                        break;
+                    default:
+                        styledText = text;
+                }
+                output.innerHTML = `<p class="animated-text">${styledText}</p>`;
+                downloadBtn.disabled = false;
+            } else {
+                alert('Please enter some text!');
+            }
+        });
+
+        downloadBtn.addEventListener('click', function () {
+            const text = textInput.value.trim();
+            if (text) {
+                // Set canvas dimensions
+                canvas.width = 500;
+                canvas.height = 200;
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw background
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw text based on selected style
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                switch (styleSelect.value) {
+                    case 'gradient':
+                        const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                        gradient.addColorStop(0, '#ff6f61');
+                        gradient.addColorStop(1, '#ffcc00');
+                        ctx.fillStyle = gradient;
+                        break;
+                    case 'shadow':
+                        ctx.fillStyle = '#333';
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                        ctx.shadowBlur = 5;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                        break;
+                    case 'outline':
+                        ctx.fillStyle = '#fff';
+                        ctx.strokeStyle = '#ff6f61';
+                        ctx.lineWidth = 2;
+                        ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+                        break;
+                    default:
+                        ctx.fillStyle = '#333';
+                }
+
+                ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+                // Convert canvas to image and trigger download
+                const link = document.createElement('a');
+                link.download = 'styled-text.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } else {
+                alert('Please generate some text first!');
+            }
+        });
+    </script>
+</body>
+</html>
